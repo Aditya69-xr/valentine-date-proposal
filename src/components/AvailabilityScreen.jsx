@@ -3,23 +3,24 @@ import { Calendar, Clock, Utensils, MessageSquareHeart, Check, ArrowRight, Heart
 
 /**
  * Interface I2_Availability: "Planning Our Date"
- * Updated according to user instructions:
- * - Date Picker beautifully decorated with hearts & badges
- * - Custom time text box removed; replaced with standard time picker & heart presets
- * - "Date" food option removed; replaced with "Your suggestion food based on your suggestion"
- * - Other Suggestions moved directly into the dining section
+ * Features:
+ * - Date Range updated: 2026 to 2030 with year quick-jump buttons
+ * - Time picker made super easy with 1-click popular romantic time slots + smooth time picker
+ * - Food Selection: 6 items (Pizza, Coffee Date, Burger, Noodles, Ramen, Food based on your suggestion)
+ * - Merged Other Suggestions box
  */
 export default function AvailabilityScreen({ onSubmit, onBack }) {
-  const today = new Date().toISOString().split('T')[0];
-  const maxDate = '2026-12-31';
+  const minDate = '2026-01-01';
+  const maxDate = '2030-12-31';
 
   // State
   const [selectedDate, setSelectedDate] = useState('2026-02-14');
-  const [selectedTime, setSelectedTime] = useState('19:00'); // 7:00 PM default
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState('7:00 PM (Candlelight Dinner 🕯️)');
+  const [customTime, setCustomTime] = useState('');
   const [selectedFoods, setSelectedFoods] = useState(['Pizza', 'Coffee Date']);
   const [suggestion, setSuggestion] = useState('');
 
-  // 6 Food options strictly as requested (Date removed, custom suggestion card added)
+  // 6 Food options
   const foodOptions = [
     { id: 'Pizza', label: 'Pizza', icon: '🍕', desc: 'Cheesy & romantic slice' },
     { id: 'Coffee Date', label: 'Coffee Date', icon: '☕', desc: 'Deep talks & latte art' },
@@ -29,11 +30,23 @@ export default function AvailabilityScreen({ onSubmit, onBack }) {
     { id: 'CustomFood', label: 'Food based on your suggestion', icon: '🍽️', desc: 'Whatever your heart desires' }
   ];
 
+  // Easy 1-click romantic time slots
   const timePresets = [
-    { time: '17:00', label: '5:00 PM', desc: 'Sunset Walk 🌅' },
-    { time: '19:00', label: '7:00 PM', desc: 'Candlelight Dinner 🕯️' },
-    { time: '20:30', label: '8:30 PM', desc: 'Dessert & Stargazing ✨' }
+    { label: '5:00 PM', desc: 'Sunset Walk 🌅' },
+    { label: '7:00 PM', desc: 'Candlelight Dinner 🕯️' },
+    { label: '8:30 PM', desc: 'Dessert & Stargazing ✨' },
+    { label: '10:00 PM', desc: 'Late Night Long Drive 🌙' }
   ];
+
+  const yearsList = ['2026', '2027', '2028', '2029', '2030'];
+
+  const handleYearChange = (yr) => {
+    // Preserve current month and day, swap year
+    const parts = selectedDate.split('-');
+    const newMonth = parts[1] || '02';
+    const newDay = parts[2] || '14';
+    setSelectedDate(`${yr}-${newMonth}-${newDay}`);
+  };
 
   const toggleFood = (id) => {
     if (selectedFoods.includes(id)) {
@@ -54,21 +67,15 @@ export default function AvailabilityScreen({ onSubmit, onBack }) {
     }
   })();
 
-  const formattedTimePreview = (() => {
-    if (!selectedTime) return '7:00 PM (Candlelight Dinner)';
-    const [h, m] = selectedTime.split(':');
-    const hour = parseInt(h, 10);
-    const ampm = hour >= 12 ? 'PM' : 'AM';
-    const hour12 = hour % 12 || 12;
-    return `${hour12}:${m} ${ampm}`;
-  })();
+  const currentYear = selectedDate.split('-')[0];
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const finalTime = customTime.trim() ? customTime : selectedTimeSlot;
     onSubmit({
       date: selectedDate,
       formattedDate: formattedDatePreview,
-      time: formattedTimePreview,
+      time: finalTime,
       foods: selectedFoods.map(f => f === 'CustomFood' ? 'Your suggestion food based on your suggestion' : f),
       suggestion: suggestion.trim() || 'A magical surprise moment together'
     });
@@ -138,24 +145,23 @@ export default function AvailabilityScreen({ onSubmit, onBack }) {
             When are you free? 💖
           </h1>
           <p style={{ color: '#6e4b52', fontSize: '14.5px', fontWeight: 500 }}>
-            Choose our romantic date, time, and comfort cravings!
+            Choose our special date (2026 - 2030), easy time slot, and food cravings!
           </p>
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
           
-          {/* Section 1: Date Selection Decorated with Hearts */}
+          {/* Section 1: Date Selection (2026 - 2030) */}
           <div
             style={{
               backgroundColor: '#fff8f9',
               padding: '22px',
               borderRadius: '24px',
               border: '2px solid #ffccd5',
-              boxShadow: '0 6px 18px rgba(220, 20, 60, 0.06)',
-              position: 'relative'
+              boxShadow: '0 6px 18px rgba(220, 20, 60, 0.06)'
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Heart size={18} fill="#ff4d6d" color="#ff4d6d" className="animate-pulse" />
                 <Calendar size={18} color="#c9184a" />
@@ -167,9 +173,10 @@ export default function AvailabilityScreen({ onSubmit, onBack }) {
                     fontFamily: 'var(--font-serif)'
                   }}
                 >
-                  Choose Date (2026)
+                  Date Selection (2026 - 2030)
                 </label>
               </div>
+
               <span
                 style={{
                   fontSize: '12px',
@@ -188,32 +195,62 @@ export default function AvailabilityScreen({ onSubmit, onBack }) {
               </span>
             </div>
 
-            <div style={{ position: 'relative' }}>
-              <input
-                type="date"
-                min={today}
-                max={maxDate}
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-                required
-                style={{
-                  width: '100%',
-                  padding: '14px 18px',
-                  fontSize: '16px',
-                  borderRadius: '16px',
-                  border: '2px solid #ffccd5',
-                  backgroundColor: '#ffffff',
-                  color: '#2a0b12',
-                  fontWeight: 700,
-                  outline: 'none',
-                  cursor: 'pointer',
-                  boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)'
-                }}
-              />
+            {/* Quick Year Selector Buttons (2026 to 2030) */}
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' }}>
+              <span style={{ fontSize: '12px', color: '#8b5a64', fontWeight: 700, alignSelf: 'center' }}>
+                Quick Year:
+              </span>
+              {yearsList.map((yr) => {
+                const isSelected = currentYear === yr;
+                return (
+                  <button
+                    key={yr}
+                    type="button"
+                    onClick={() => handleYearChange(yr)}
+                    style={{
+                      padding: '6px 14px',
+                      borderRadius: '12px',
+                      border: isSelected ? '2px solid #e60039' : '1px solid #ffccd5',
+                      backgroundColor: isSelected ? '#e60039' : '#ffffff',
+                      color: isSelected ? '#ffffff' : '#800e26',
+                      fontWeight: 800,
+                      fontSize: '13px',
+                      cursor: 'pointer',
+                      boxShadow: isSelected ? '0 4px 12px rgba(230, 0, 57, 0.25)' : 'none',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    {yr}
+                  </button>
+                );
+              })}
             </div>
+
+            {/* Native Calendar Input (Bounded 2026 to 2030) */}
+            <input
+              type="date"
+              min={minDate}
+              max={maxDate}
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              required
+              style={{
+                width: '100%',
+                padding: '14px 18px',
+                fontSize: '16px',
+                borderRadius: '16px',
+                border: '2px solid #ffccd5',
+                backgroundColor: '#ffffff',
+                color: '#2a0b12',
+                fontWeight: 700,
+                outline: 'none',
+                cursor: 'pointer',
+                boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)'
+              }}
+            />
           </div>
 
-          {/* Section 2: Time Selection (Same clean input like Date, with Candlelight presets) */}
+          {/* Section 2: Easy Time Selection */}
           <div
             style={{
               backgroundColor: '#fff8f9',
@@ -235,7 +272,7 @@ export default function AvailabilityScreen({ onSubmit, onBack }) {
                     fontFamily: 'var(--font-serif)'
                   }}
                 >
-                  Choose Time
+                  Select Time
                 </label>
               </div>
               <span
@@ -248,62 +285,68 @@ export default function AvailabilityScreen({ onSubmit, onBack }) {
                   fontWeight: 800
                 }}
               >
-                🕯️ {formattedTimePreview}
+                🕯️ {customTime.trim() ? customTime : selectedTimeSlot}
               </span>
             </div>
 
-            {/* Clean Time Input */}
-            <input
-              type="time"
-              value={selectedTime}
-              onChange={(e) => setSelectedTime(e.target.value)}
-              required
-              style={{
-                width: '100%',
-                padding: '14px 18px',
-                fontSize: '16px',
-                borderRadius: '16px',
-                border: '2px solid #ffccd5',
-                backgroundColor: '#ffffff',
-                color: '#2a0b12',
-                fontWeight: 700,
-                outline: 'none',
-                cursor: 'pointer',
-                marginBottom: '12px'
-              }}
-            />
-
-            {/* Quick Heart Time Presets */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+            {/* 1-Click Easy Popular Romantic Time Presets */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(135px, 1fr))', gap: '8px', marginBottom: '14px' }}>
               {timePresets.map((t) => {
-                const isSelected = selectedTime === t.time;
+                const fullText = `${t.label} (${t.desc})`;
+                const isSelected = selectedTimeSlot.startsWith(t.label) && !customTime;
                 return (
                   <button
-                    key={t.time}
+                    key={t.label}
                     type="button"
-                    onClick={() => setSelectedTime(t.time)}
+                    onClick={() => {
+                      setSelectedTimeSlot(fullText);
+                      setCustomTime('');
+                    }}
                     style={{
-                      padding: '10px 8px',
-                      borderRadius: '14px',
+                      padding: '12px 10px',
+                      borderRadius: '16px',
                       textAlign: 'center',
                       border: isSelected ? '2px solid #e60039' : '1.5px solid #ffccd5',
                       backgroundColor: isSelected ? '#ffe5eb' : '#ffffff',
                       cursor: 'pointer',
-                      fontSize: '12px',
-                      fontWeight: 700,
-                      color: isSelected ? '#a4161a' : '#555',
-                      transition: 'all 0.2s ease'
+                      transition: 'all 0.2s ease',
+                      boxShadow: isSelected ? '0 6px 15px rgba(230, 0, 57, 0.18)' : 'none'
                     }}
                   >
-                    <div>{t.label}</div>
-                    <div style={{ fontSize: '10px', color: '#888', marginTop: '2px' }}>{t.desc}</div>
+                    <div style={{ fontWeight: 800, fontSize: '13.5px', color: isSelected ? '#a4161a' : '#2a0b12' }}>
+                      {t.label}
+                    </div>
+                    <div style={{ fontSize: '11px', color: '#6e4b52', marginTop: '2px', fontWeight: 500 }}>
+                      {t.desc}
+                    </div>
                   </button>
                 );
               })}
             </div>
+
+            {/* Custom Time Option */}
+            <div style={{ position: 'relative' }}>
+              <input
+                type="text"
+                placeholder="Or type custom time (e.g. 6:30 PM, Sunset, Midnight brunch)"
+                value={customTime}
+                onChange={(e) => setCustomTime(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  borderRadius: '12px',
+                  border: customTime ? '2px solid #e60039' : '1.5px solid #ffccd5',
+                  backgroundColor: '#ffffff',
+                  fontSize: '13px',
+                  outline: 'none',
+                  color: '#2a0b12',
+                  fontWeight: 600
+                }}
+              />
+            </div>
           </div>
 
-          {/* Section 3: Food Selection + Other Suggestions merged right here */}
+          {/* Section 3: Food Selection + Other Suggestions */}
           <div
             style={{
               backgroundColor: '#fff8f9',
@@ -394,7 +437,7 @@ export default function AvailabilityScreen({ onSubmit, onBack }) {
               })}
             </div>
 
-            {/* Other Suggestions Box (Merged directly with food) */}
+            {/* Other Suggestions Box */}
             <div style={{ borderTop: '1px dashed #ffccd5', paddingTop: '14px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
                 <MessageSquareHeart size={16} color="#c9184a" />
