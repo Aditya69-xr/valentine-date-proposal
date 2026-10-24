@@ -1,0 +1,62 @@
+{
+  "project_name": "Valentine's Day Date Proposal",
+  "theme": {
+    "style": "Romantic, Soft, Elegant, High Contrast",
+    "colors": ["Deep Red", "Rose Gold", "Soft Pink", "Cream/White"],
+    "elements": [
+      "Floating Hearts (3D)",
+      "Watercolor Flowers (Roses, Peonies)",
+      "Delicate Birds",
+      "Central Element: A very large, stylized initial 'B' (Bold and romantic)",
+      "Background: Soft bokeh lights or subtle glitter effect"
+    ],
+    "font_style": "Elegant Script for titles, Clean Sans-serif for body text"
+  },
+  "interface_flow": [
+    {
+      "interface_id": "I1_Proposal",
+      "title": "A Special Invitation",
+      "description": "The initial screen of the Valentine's theme.",
+      "elements": [
+        {"type": "visual", "description": "Full romantic background, central 'B', hearts, and flowers."},
+        {"type": "question", "text": "Will you go on a date with me?", "style": "Large, centered font"},
+        {"type": "button_group", "buttons": [
+          {"label": "Yes", "action": "proceed_to_I2"},
+          {"label": "No", "action": "loop_no_option"}
+        ]}
+      ],
+      "logic": {
+        "action_yes": "Transition to I2_Availability",
+        "action_no": "Persistent_loop_no"
+      }
+    },
+    {
+      "interface_id": "I2_Availability",
+      "title": "Planning Our Date",
+      "description": "The interface for scheduling and food preferences.",
+      "elements": [
+        {"type": "question", "text": "When are you free?", "style": "Prominent header"},
+        {"type": "input_group", "label": "Date Selection (2026)", "data_type": "Date_Range", "range_start": "Today's Date", "range_end": "2026-12-31"},
+        {"type": "input_group", "label": "Time Availability", "data_type": "Time_Slot", "description": "Specify available time (e.g., 7 PM, 5 PM)"},
+        {"type": "food_selection", "label": "What should we eat?", "options": [
+          "Burger", "Pizza", "Noodles", "Ramen", "Matcha", "Coffee Date", "Date"
+        ]},
+        {"type": "input_box", "label": "Other Suggestions", "placeholder": "[Your suggestion]", "action": "search_submit"}
+      ],
+      "logic": {
+        "action_submit": "Final_Confirmation_Send"
+      }
+    }
+  ],
+  "final_action": {
+    "step": "Final_Confirmation_Send",
+    "output": {
+      "message_to_user": "You are done. You will get a message on your WhatsApp number.",
+      "action": "Trigger_WhatsApp_Notification"
+    }
+  },
+  "technical_notes": {
+    "platform_suggestion": "React/Vue.js for dynamic state management.",
+    "crucial_logic_reminder": "The 'No' button MUST create an infinite loop/persistence until 'Yes' is clicked. The transition from I1 to I2 is instantaneous upon clicking 'Yes'."
+  }
+}
