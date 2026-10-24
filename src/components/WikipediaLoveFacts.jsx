@@ -63,12 +63,12 @@ export default function WikipediaLoveFacts() {
 
   return (
     <>
-      {/* Floating Pill Trigger */}
+      {/* Floating Pill Trigger (Top-Left) */}
       <div
         style={{
           position: 'fixed',
           top: '20px',
-          right: '20px',
+          left: '24px',
           zIndex: 40
         }}
       >
