@@ -1,28 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import HappyValentineEmblem from './HappyValentineEmblem';
+import LoveLetterModal from './LoveLetterModal';
 import { playChime } from '../utils/romanticAudio';
 import { 
   CheckCircle2, MessageCircle, Calendar, Clock, Utensils, 
-  Sparkles, Copy, Check, Ticket, Send, Heart 
+  Sparkles, Copy, Check, Ticket, Send, Heart, Gift 
 } from 'lucide-react';
 
 /**
  * Interface Final_Confirmation_Send:
  * message_to_user: "You are done. You will get a message on your WhatsApp number."
- * action: "Trigger_WhatsApp_Notification"
- * (Replay Proposal button removed as requested)
+ * Features:
+ * - VIP Valentine Date Pass Ticket
+ * - Direct WhatsApp Dispatch
+ * - Interactive Surprise Gift Box opening a heart love letter with Teddy Bears & Shayaris!
  */
 export default function FinalConfirmation({ planData }) {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [showNotification, setShowNotification] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [isLetterOpen, setIsLetterOpen] = useState(false);
 
   useEffect(() => {
-    // Play celebratory romantic chime
     playChime();
 
-    // Grand celebration fireworks!
     const duration = 2.5 * 1000;
     const end = Date.now() + duration;
 
@@ -48,25 +50,9 @@ export default function FinalConfirmation({ planData }) {
     };
     frame();
 
-    // Slide in the realistic WhatsApp push notification banner
     const timer = setTimeout(() => {
       setShowNotification(true);
     }, 600);
-
-    // Save proposal to localStorage
-    try {
-      const payload = {
-        id: Date.now(),
-        ...planData,
-        status: 'Accepted',
-        timestamp: new Date().toISOString()
-      };
-      const existing = JSON.parse(localStorage.getItem('proposals') || '[]');
-      existing.push(payload);
-      localStorage.setItem('proposals', JSON.stringify(existing));
-    } catch {
-      // ignore
-    }
 
     return () => clearTimeout(timer);
   }, [planData]);
@@ -76,7 +62,7 @@ export default function FinalConfirmation({ planData }) {
   const messageText = `🌹 *Valentine's Date Proposal Confirmed!* 💖\n\n` +
     `💍 *Status:* Accepted with all my heart!\n` +
     `📅 *Scheduled Date:* ${displayDate}\n` +
-    `⏰ *Time Slot:* ${planData.time}\n` +
+    `⏰ *Time:* ${planData.time}\n` +
     `🍽️ *Food Preferences:* ${planData.foods.join(', ')}\n` +
     `💌 *Sweet Note:* "${planData.suggestion}"\n\n` +
     `Can't wait for our special date! 💕✨`;
@@ -96,6 +82,17 @@ export default function FinalConfirmation({ planData }) {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleOpenGift = () => {
+    playChime();
+    confetti({
+      particleCount: 90,
+      spread: 90,
+      origin: { y: 0.6 },
+      colors: ['#ff0055', '#ff5483', '#ffd166', '#c9184a']
+    });
+    setIsLetterOpen(true);
+  };
+
   return (
     <div
       style={{
@@ -109,7 +106,7 @@ export default function FinalConfirmation({ planData }) {
         zIndex: 10
       }}
     >
-      {/* Realistic WhatsApp Push Notification Banner */}
+      {/* Sliding WhatsApp Alert */}
       {showNotification && (
         <div
           style={{
@@ -153,7 +150,7 @@ export default function FinalConfirmation({ planData }) {
               <span style={{ fontSize: '10.5px', color: '#667781' }}>Just now</span>
             </div>
             <p style={{ margin: '3px 0 0 0', fontSize: '12px', color: '#3b4a54', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              💖 Valentine Date Confirmed! Candlelight dinner & memories locked in.
+              💖 Valentine Date Confirmed! You will get a message on your WhatsApp number.
             </p>
           </div>
         </div>
@@ -167,7 +164,7 @@ export default function FinalConfirmation({ planData }) {
           backgroundColor: 'rgba(255, 255, 255, 0.94)',
           backdropFilter: 'blur(20px)',
           borderRadius: '36px',
-          border: '2px solid rgba(255, 182, 193, 0.7)',
+          border: '2px solid rgba(255, 182, 193, 0.75)',
           boxShadow: '0 25px 65px rgba(220, 20, 60, 0.18)',
           padding: '40px 30px',
           textAlign: 'center',
@@ -227,7 +224,7 @@ export default function FinalConfirmation({ planData }) {
           You will get a message on your WhatsApp number. 💌
         </p>
 
-        {/* Romantic VIP Boarding Pass / Ticket Card */}
+        {/* VIP Boarding Pass Ticket */}
         <div
           style={{
             background: 'linear-gradient(135deg, #ffffff 0%, #fff7f8 100%)',
@@ -236,11 +233,9 @@ export default function FinalConfirmation({ planData }) {
             padding: '24px',
             textAlign: 'left',
             marginBottom: '24px',
-            boxShadow: '0 10px 25px rgba(201, 24, 74, 0.08)',
-            position: 'relative'
+            boxShadow: '0 10px 25px rgba(201, 24, 74, 0.08)'
           }}
         >
-          {/* Ticket Header */}
           <div
             style={{
               display: 'flex',
@@ -262,7 +257,6 @@ export default function FinalConfirmation({ planData }) {
             </span>
           </div>
 
-          {/* Ticket Body */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
             <div>
               <span style={{ fontSize: '11px', color: '#7a5259', textTransform: 'uppercase', display: 'block', fontWeight: 600 }}>Date</span>
@@ -270,7 +264,7 @@ export default function FinalConfirmation({ planData }) {
             </div>
 
             <div>
-              <span style={{ fontSize: '11px', color: '#7a5259', textTransform: 'uppercase', display: 'block', fontWeight: 600 }}>Time Slot</span>
+              <span style={{ fontSize: '11px', color: '#7a5259', textTransform: 'uppercase', display: 'block', fontWeight: 600 }}>Time</span>
               <strong style={{ fontSize: '15px', color: '#2a0b12' }}>{planData.time}</strong>
             </div>
 
@@ -298,7 +292,7 @@ export default function FinalConfirmation({ planData }) {
 
             {planData.suggestion && (
               <div style={{ gridColumn: 'span 2', backgroundColor: '#fdf2f4', padding: '12px 16px', borderRadius: '14px', border: '1px solid #f9ccd4' }}>
-                <span style={{ fontSize: '11px', color: '#7a5259', textTransform: 'uppercase', display: 'block', fontWeight: 600 }}>Sweet Note</span>
+                <span style={{ fontSize: '11px', color: '#7a5259', textTransform: 'uppercase', display: 'block', fontWeight: 600 }}>Sweet Wish</span>
                 <span style={{ fontSize: '13.5px', fontStyle: 'italic', color: '#800e26', fontWeight: 600 }}>
                   "{planData.suggestion}"
                 </span>
@@ -306,7 +300,6 @@ export default function FinalConfirmation({ planData }) {
             )}
           </div>
 
-          {/* Ticket Footer */}
           <div
             style={{
               display: 'flex',
@@ -333,7 +326,7 @@ export default function FinalConfirmation({ planData }) {
             border: '2px solid #86efac',
             borderRadius: '22px',
             padding: '20px',
-            marginBottom: '20px'
+            marginBottom: '24px'
           }}
         >
           <label
@@ -346,7 +339,7 @@ export default function FinalConfirmation({ planData }) {
               textAlign: 'left'
             }}
           >
-            Send Direct WhatsApp Confirmation Message:
+            Send WhatsApp Notification Message:
           </label>
           <div style={{ display: 'flex', gap: '10px' }}>
             <input
@@ -387,6 +380,49 @@ export default function FinalConfirmation({ planData }) {
               <span>Send</span>
             </button>
           </div>
+
+          <p style={{ margin: '12px 0 0 0', fontSize: '13px', color: '#166534', fontWeight: 600, fontStyle: 'italic' }}>
+            "You will get a personalized romantic message with all your date details!" 💖
+          </p>
+        </div>
+
+        {/* 🎁 SURPRISE VALENTINE GIFT BOX (Tap to Open Love Letter with Teddy & Shayaris!) */}
+        <div
+          onClick={handleOpenGift}
+          style={{
+            background: 'linear-gradient(135deg, #fff0f3 0%, #ffe5eb 100%)',
+            border: '2.5px dashed #ff4d6d',
+            borderRadius: '24px',
+            padding: '20px',
+            cursor: 'pointer',
+            marginBottom: '22px',
+            transition: 'all 0.3s ease',
+            boxShadow: '0 10px 25px rgba(230, 0, 57, 0.15)'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'scale(1.02)';
+            e.currentTarget.style.boxShadow = '0 14px 30px rgba(230, 0, 57, 0.25)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'scale(1)';
+            e.currentTarget.style.boxShadow = '0 10px 25px rgba(230, 0, 57, 0.15)';
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
+            <span style={{ fontSize: '36px' }} className="animate-bounce">🎁</span>
+            <div style={{ textAlign: 'left' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Heart size={16} fill="#e60039" color="#e60039" />
+                <strong style={{ fontSize: '16px', color: '#a4161a', fontFamily: 'var(--font-serif)' }}>
+                  A Special Valentine Gift For You
+                </strong>
+              </div>
+              <p style={{ margin: '3px 0 0 0', fontSize: '12.5px', color: '#800e26', fontWeight: 600 }}>
+                Tap here to open your Secret Heart Love Letter & Shayaris! 💌✨
+              </p>
+            </div>
+            <Sparkles size={20} color="#e5a93c" />
+          </div>
         </div>
 
         {/* Action Button: Copy Summary */}
@@ -413,6 +449,12 @@ export default function FinalConfirmation({ planData }) {
           </button>
         </div>
       </div>
+
+      {/* Love Letter Modal (Teddy Bears, Fluttering Hearts & Shayaris) */}
+      <LoveLetterModal
+        isOpen={isLetterOpen}
+        onClose={() => setIsLetterOpen(false)}
+      />
     </div>
   );
 }
